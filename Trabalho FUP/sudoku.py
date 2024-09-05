@@ -1,18 +1,28 @@
 # Equipe: Carlos Alexandre, Jonathan Duarte, Helionardo Mendes | Sudoku #
 
+from sys import argv #Será usada para ver os argumentos, arquivos e separar os modos
+
+letracoluna = [''] #Variável criada para salvar a letra da coluna para usar nos prints
+
+posicaopistas = list() #Lista para salvar as posicoes das pistas 
+
+arquivopistas = argv[1]
+
+if len(argv)==3:
+    arquivobatch = argv[2]
+
 # FUNCOES:
 
 # Funcao feita para imprimir a tabela com seus respectivos valores:
 
-from sys import argv #Será usada para ver os argumentos e separar os modos
-
 def tabela(matriz=list()):
-    print('''                   _       _          
+    print("""                   _       _          
      ___ _   _  __| | ___ | | ___   _ 
     / __| | | |/ _` |/ _ \| |/ / | | |
     \__ \ |_| | (_| | (_) |   <| |_| |
     |___/\__,_|\__,_|\___/|_|\_\__,__|
-                                  ''')
+                                  """)
+    
     print(f"{'A':>5}{'B':>4}{'C':>4}{'D':>5}{'E':>4}{'F':>4}{'G':>5}{'H':>4}{'I':>4}")
     print(' ++---+---+---++---+---+---++---+---+---++ ')
     
@@ -34,7 +44,7 @@ def tabela(matriz=list()):
     print(f"{'A':>5}{'B':>4}{'C':>4}{'D':>5}{'E':>4}{'F':>4}{'G':>5}{'H':>4}{'I':>4}")
 
 
-# Funcao feita para ler os arquivos e transformar em variáveis no MODO INTERATIVO:
+# Funcao feita para ler os arquivos e transformar em variáveis no MODO INTERATIVO e PISTAS:
 
 def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | string = jogada
     
@@ -45,7 +55,7 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
     booldicasdelete = False # Variável para voltar o resultado da variável "jogada_inv" que vai ser usada como True para não percorrer a função inteira, e no final irá voltar a ser False.
 
     if not poj:
-      with open ('arq_01_cfg', 'r') as pistas: #Leitura do arquivo para uma lista de strings
+      with open (arquivopistas, 'r') as pistas: #Leitura do arquivo para uma lista de strings
           for i in pistas.readlines():
               varstring = i.replace(',','').replace(':','').replace(' ','').strip() #Tratamento das strings
               lista.append(varstring)
@@ -54,6 +64,7 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
     else:
       varstring = string.replace(',','').replace(':','').replace(' ','').strip() #Tratamento das strings
       lista.append(varstring)
+      
 
     for i in lista:
         #Verificando se as colunas estão dentro das esperadas, caso não esteja o programa é encerrado.
@@ -73,6 +84,9 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
           a = 0
 
         if not jogada_inv and i[a] in "AaBbCcDdEeFfGgHhIi":
+            
+            letracoluna[0] = i[a].upper() #Salvar letra da coluna
+
             if i[a] in "Aa":
                 col = 0
             elif i[a] in "Bb":
@@ -110,11 +124,12 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
                 booldicasdelete = True # Variável para voltar o resultado da variável "jogada_inv" que vai ser usada como True para não percorrer a função inteira, e no final irá voltar a ser False.
 
         elif not jogada_inv and poj and i[0] == "!":
-          if pistasocupadas(col,i[2], sudoku):
-            print("O espaco ja esta ocupado com uma pista e nao pode ser deletado.")
-          else:
-             if not verificar(col,i[2], sudoku):
-               delete(col,i[2], sudoku)
+            if pistasocupadas(col,int(i[2])-1, posicaopistas):
+                print("O espaco ja esta ocupado com uma pista e nao pode ser deletado.")
+            else:
+                jogada_inv = True
+                booldicasdelete = True
+                delete(col,int(i[2])-1, sudoku)
         
         if not jogada_inv and len(lista)<1 or len(lista)>80: #Verificando se o total de pistas está entre o intervalo [1;80]
             if not poj:
@@ -190,8 +205,9 @@ def verificar(col, lin, val, matriz = list(), saopistas=True):
        flag = False
 
     # Verificacao se a posição na matriz já está ocupada:
-    if matriz[col][lin] != " " and flag:
+    if flag and matriz[col][lin] != " ":
         flag = False
+    
     # Verificacao das linhas e colunas
 
     i=0
@@ -311,7 +327,7 @@ def dicas(col, lin, matriz = list()):
             if verificar(col, lin, i, matriz):
                 numerosdisponiveis.append(i)
 
-        print(f'\nVALORES DISPONIVEIS: ', end='')
+        print(f'\nValores Disponiveis({letracoluna[0]}, {lin+1}): ', end='')
         for i in numerosdisponiveis:
             if i == numerosdisponiveis[len(numerosdisponiveis)-1]:
                 print(f'{i}')
@@ -324,7 +340,9 @@ def dicas(col, lin, matriz = list()):
 #Funcao para quando o jogador querer deletar o valor de alguma posicao:
 
 def delete (col, lin, matriz):
+    valor = matriz[col][lin]
     matriz[col][lin] = ' '
+    print(f'\nValor {valor} removido da posição ({letracoluna[0]}, {lin+1})')
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MAIN -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
@@ -334,17 +352,13 @@ for i in range(9):
   linha = [" "]*9
   sudoku.append(linha)
 
-posicaopistas = list() #Lista para salvar as posicoes das pistas 
-
 pistaoujogada = False #Variável booleana criada para a funcao leitura em que irá ler ou os arquivos das pistas ou a string da jogada 
 leituraIP(pistaoujogada)
 pistaoujogada = True
 
-jogada_invalida =  False #Variavel booleana criada para avisar quando a jogada for invalida e o jogador ter que digitar novamente sua jogada.
+mostrartabela = [True] #Variável para não mostrar tabela depois de usar dica
 
-mostrartabela= [True] #Variável  para não mostrar tabela depois de usar dica
-
-if len(argv)==1:
+if len(argv)==2:
     while not completa(sudoku):
         if mostrartabela[0]:
             tabela(sudoku)
@@ -353,5 +367,5 @@ if len(argv)==1:
             jogada = input('\nDigite sua jogada novamente: ')
 
     if completa(sudoku):
-        print(f'VOCE GANHOU!!! Parabens!!!')
+        print(f'\nVOCE GANHOU!!! Parabens!!!')
     
