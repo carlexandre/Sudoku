@@ -2,7 +2,7 @@
 
 # FUNCOES:
 
-# Funcao feita para imprimir a tabela com seus respectivos valores.
+# Funcao feita para imprimir a tabela com seus respectivos valores:
 
 def tabela(matriz=list()):
     print('''                   _       _          
@@ -32,7 +32,7 @@ def tabela(matriz=list()):
     print(f"{'A':>5}{'B':>4}{'C':>4}{'D':>5}{'E':>4}{'F':>4}{'G':>5}{'H':>4}{'I':>4}")
 
 
-# Funcao feita para ler os arquivos e transformar em variáveis.
+# Funcao feita para ler os arquivos e transformar em variáveis:
 
 def leitura(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | string = jogada
     
@@ -45,6 +45,7 @@ def leitura(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | st
           for i in pistas.readlines():
               varstring = i.replace(',','').replace(':','').replace(' ','').strip() #Tratamento das strings
               lista.append(varstring)
+              posicaopistas.append(varstring)
 
     else:
       varstring = string.replace(',','').replace(':','').replace(' ','').strip() #Tratamento das strings
@@ -107,7 +108,7 @@ def leitura(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | st
         lin = int(i[1])-1 #Adicionando valor para a linha
         val = int(i[2]) #Valor a ser adicionado na matriz
 
-        if verificar(col, lin, val, sudoku): #Verifica se está valido
+        if verificar(col, lin, val, sudoku, not poj): #Verifica se está valido
             add(col, lin, val, sudoku) #Adiciona na matriz
         
         else:  #Caso não esteja válido verá qual o motivo abaixo
@@ -115,7 +116,7 @@ def leitura(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | st
             print(f'O programa foi encerrado por motivos de Pistas Invalidas.')
             exit()
           else:
-            if sudoku[col][lin] != " ":
+            if sudoku[col][lin] != " " and not pistasocupadas(col, lin, posicaopistas):
               mt = 0
               while mt!=1 and mt!=2:
                  print(f'Posicao ja esta ocupada. Voce deseja manter o valor ou trocar pelo novo numero? [1] MANTER | [2] TROCAR ')
@@ -128,21 +129,29 @@ def leitura(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | st
 
     return jogada_inv
 
-# Funcao feita para adicionar os valores na tabela
+
+# Funcao feita para adicionar os valores na tabela:
 
 def add(col, lin, val, matriz = list()):
   matriz[col][lin] = val
 
 
-# Funcao feita para verificar se os valores recebidos estão de acordo com as regras do sudoku
+# Funcao feita para verificar se os valores recebidos estão de acordo com as regras do sudoku:
 
-def verificar(col, lin, val, matriz = list()):
+def verificar(col, lin, val, matriz = list(), saopistas=True): 
+    
+    #saopistas será usado para quando rodar as pistas(False) elas não pararem na função pistasocupadas. True é quando não for as pistas
 
-    flag = True #Flag para retornar se há algum erro ou não.
+    flag = True #Flag para retornar se há algum erro(False) ou não(True).
+
+    #Verificando se a posição na matriz é ocupada por uma pista:
+
+    if pistasocupadas(col, lin, posicaopistas) and not saopistas:
+       flag = False
 
     # Verificacao se a posição na matriz já está ocupada:
 
-    if matriz[col][lin] != " ":
+    if matriz[col][lin] != " " and flag:
         flag = False
     # Verificacao das linhas e colunas
 
@@ -193,6 +202,60 @@ def verificar(col, lin, val, matriz = list()):
     return flag
 
 
+# Funcao para verificar se a tabela está completa ou não, para o jogo finalizar:
+
+def completa(matriz = list()):
+    i = j = 0
+    flag = True
+    while i<9 and flag:
+        j=0
+        while j<9 and flag:
+            if matriz[i][j] == " ": #Se tiver alguma posição vazia na matriz a flag fica falsa e mostra que não está completa
+                flag = False
+            j+=1
+        i+=1
+    
+    return flag
+
+
+# Funcao feita para verificar se a jogada está numa posicao em que uma pista ocupa:
+
+def pistasocupadas(col, lin, lista = list()): 
+
+    flag = False
+
+    c = int() #Variavel para receber valor da coluna no for abaixo
+
+    i=0
+
+    while not flag and i<len(lista): #Transformando as letras das colunas em números para poder comparar depois
+        if lista[i][0] in "Aa":
+            c = 0
+        elif lista[i][0] in "Bb":
+            c = 1
+        elif lista[i][0] in "Cc":
+            c = 2
+        elif lista[i][0] in "Dd":
+            c = 3
+        elif lista[i][0] in "Ee":
+            c = 4
+        elif lista[i][0] in "Ff":
+            c = 5
+        elif lista[i][0] in "Gg":
+            c = 6
+        elif lista[i][0] in "Hh":
+            c = 7
+        elif lista[i][0] in "Ii":
+            c = 8
+        
+        if col == c and lin == int(lista[i][1])-1: #Comparando se a coluna e a linha estão em uma posição ocupada por uma pista
+            flag = True
+
+        i+=1
+        
+    return flag
+
+
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MAIN -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
 # Inicializando a matriz:
@@ -201,17 +264,19 @@ for i in range(9):
   linha = [" "]*9
   sudoku.append(linha)
 
+posicaopistas = list() #Lista para salvar as posicoes das pistas 
+
 pistaoujogada = False #Variável booleana criada para a funcao leitura em que irá ler ou os arquivos das pistas ou a string da jogada 
 leitura(pistaoujogada)
 pistaoujogada = True
 
 jogada_invalida =  False #Variavel booleana criada para avisar quando a jogada for invalida e o jogador ter que digitar novamente sua jogada.
 
-while True:
+while not completa(sudoku):
   tabela(sudoku)
   jogada = input('\nDigite sua jogada: ')
-  while leitura(pistaoujogada, jogada): #Enquanto a jogada for inválida ele irá repetir a jogada
+  while leitura(pistaoujogada, jogada): #Enquanto a jogada for inválida ele irá repeti-la.
     jogada = input('\nDigite sua jogada novamente: ')
 
-
-
+if completa(sudoku):
+   print(f'VOCE GANHOU!!! Parabens!!!')
