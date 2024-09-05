@@ -4,6 +4,8 @@
 
 # Funcao feita para imprimir a tabela com seus respectivos valores:
 
+from sys import argv #Será usada para ver os argumentos e separar os modos
+
 def tabela(matriz=list()):
     print('''                   _       _          
      ___ _   _  __| | ___ | | ___   _ 
@@ -32,13 +34,15 @@ def tabela(matriz=list()):
     print(f"{'A':>5}{'B':>4}{'C':>4}{'D':>5}{'E':>4}{'F':>4}{'G':>5}{'H':>4}{'I':>4}")
 
 
-# Funcao feita para ler os arquivos e transformar em variáveis:
+# Funcao feita para ler os arquivos e transformar em variáveis no MODO INTERATIVO:
 
-def leitura(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | string = jogada
+def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | string = jogada
     
     lista = list() 
 
-    jogada_inv=False #Variável feita para retornar para a função principal se o jogador fez uma jogada válida ou não
+    jogada_inv = False # Variável feita para retornar para a função principal se o jogador fez uma jogada válida ou não
+
+    booldicasdelete = False # Variável para voltar o resultado da variável "jogada_inv" que vai ser usada como True para não percorrer a função inteira, e no final irá voltar a ser False.
 
     if not poj:
       with open ('arq_01_cfg', 'r') as pistas: #Leitura do arquivo para uma lista de strings
@@ -54,79 +58,115 @@ def leitura(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | st
     for i in lista:
         #Verificando se as colunas estão dentro das esperadas, caso não esteja o programa é encerrado.
         #Transformando as letras em números para adicionar na matriz.
-        if i[0] in "AaBbCcDdEeFfGgHhIi":
-            if i[0] in "Aa":
+
+        if len(i) != 3:
+            if not poj:
+              print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
+              exit()
+            else:
+              print("Jogada invalida! Por favor insira uma jogada valida.")
+              jogada_inv = True
+
+        if not jogada_inv and poj and i[0] in "?!":
+          a = 1
+        else:
+          a = 0
+
+        if not jogada_inv and i[a] in "AaBbCcDdEeFfGgHhIi":
+            if i[a] in "Aa":
                 col = 0
-            elif i[0] in "Bb":
+            elif i[a] in "Bb":
                 col = 1
-            elif i[0] in "Cc":
+            elif i[a] in "Cc":
                 col = 2
-            elif i[0] in "Dd":
+            elif i[a] in "Dd":
                 col = 3
-            elif i[0] in "Ee":
+            elif i[a] in "Ee":
                 col = 4
-            elif i[0] in "Ff":
+            elif i[a] in "Ff":
                 col = 5
-            elif i[0] in "Gg":
+            elif i[a] in "Gg":
                 col = 6
-            elif i[0] in "Hh":
+            elif i[a] in "Hh":
                 col = 7
-            elif i[0] in "Ii":
+            elif i[a] in "Ii":
                 col = 8
+
         else:
             if not poj:
               print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
               exit()
-            else:
-              print("Jogada invalida! Por favor insira uma jogada valida.")
-              jogada_inv = True
-        
-        if len(lista)<1 or len(lista)>80: #Verificando se o total de pistas está entre o intervalo [1;80]
-            if not poj:
-              print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
-              exit()
-            else:
+            elif not jogada_inv:
               print("Jogada invalida! Por favor insira uma jogada valida.")
               jogada_inv = True
 
-        elif i[2] not in '123456789': #Verificando se o valor está entre 1 e 9
-            if not poj:
-              print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
-              exit()
+        if not jogada_inv and poj and i[0] == "?":
+            if dicas(col,int(i[2])-1, sudoku):
+                jogada_inv = True
+                booldicasdelete = False
             else:
-              print("Jogada invalida! Por favor insira uma jogada valida.")
-              jogada_inv = True
-        
-        elif i[1] not in '123456789': #Verificando se as linhas estão dentro as esperadas.
-            if not poj:
-              print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
-              exit()
-            else:
-              print("Jogada invalida! Por favor insira uma jogada valida.")
-              jogada_inv = True
+                mostrartabela[0] = False
+                jogada_inv = True
+                booldicasdelete = True # Variável para voltar o resultado da variável "jogada_inv" que vai ser usada como True para não percorrer a função inteira, e no final irá voltar a ser False.
 
-        lin = int(i[1])-1 #Adicionando valor para a linha
-        val = int(i[2]) #Valor a ser adicionado na matriz
-
-        if verificar(col, lin, val, sudoku, not poj): #Verifica se está valido
-            add(col, lin, val, sudoku) #Adiciona na matriz
-        
-        else:  #Caso não esteja válido verá qual o motivo abaixo
-          if not poj:
-            print(f'O programa foi encerrado por motivos de Pistas Invalidas.')
-            exit()
+        elif not jogada_inv and poj and i[0] == "!":
+          if pistasocupadas(col,i[2], sudoku):
+            print("O espaco ja esta ocupado com uma pista e nao pode ser deletado.")
           else:
-            if sudoku[col][lin] != " " and not pistasocupadas(col, lin, posicaopistas):
-              mt = 0
-              while mt!=1 and mt!=2:
-                 print(f'Posicao ja esta ocupada. Voce deseja manter o valor ou trocar pelo novo numero? [1] MANTER | [2] TROCAR ')
-                 mt = int(input())
-              if mt == 2:
-                add(col,lin,val,sudoku)
+             if not verificar(col,i[2], sudoku):
+               delete(col,i[2], sudoku)
+        
+        if not jogada_inv and len(lista)<1 or len(lista)>80: #Verificando se o total de pistas está entre o intervalo [1;80]
+            if not poj:
+              print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
+              exit()
             else:
               print("Jogada invalida! Por favor insira uma jogada valida.")
               jogada_inv = True
 
+        elif not jogada_inv and i[2] not in '123456789': #Verificando se o valor está entre 1 e 9
+            if not poj:
+              print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
+              exit()
+            else:
+              print("Jogada invalida! Por favor insira uma jogada valida.")
+              jogada_inv = True
+        
+        elif not jogada_inv and i[1] not in '123456789': #Verificando se as linhas estão dentro as esperadas.
+            if not poj:
+              print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
+              exit()
+            else:
+              print("Jogada invalida! Por favor insira uma jogada valida.")
+              jogada_inv = True
+
+        if not jogada_inv:
+            lin = int(i[1])-1 #Adicionando valor para a linha
+            val = int(i[2]) #Valor a ser adicionado na matriz
+
+            if verificar(col, lin, val, sudoku, not poj): #Verifica se está valido
+                add(col, lin, val, sudoku) #Adiciona na matriz
+        
+            else:  #Caso não esteja válido verá qual o motivo abaixo
+                if not poj:
+                    print(f'O programa foi encerrado por motivos de Pistas Invalidas.')
+                    exit()
+                else:
+                    mt=1
+                    if sudoku[col][lin] != " " and not pistasocupadas(col, lin, posicaopistas):
+                        mt = 0
+                    while mt!=1 and mt!=2:
+                        print(f'Posicao ja esta ocupada. Voce deseja manter o valor ou trocar pelo novo numero? [1] MANTER | [2] TROCAR ')
+                        mt = int(input())
+                    if mt == 2:
+                        add(col,lin,val,sudoku)
+                    else:
+                        print("Jogada invalida! Por favor insira uma jogada valida.")
+                        jogada_inv = True
+    
+    if booldicasdelete:
+        jogada_inv = False
+    
     return jogada_inv
 
 
@@ -140,7 +180,7 @@ def add(col, lin, val, matriz = list()):
 
 def verificar(col, lin, val, matriz = list(), saopistas=True): 
     
-    #saopistas será usado para quando rodar as pistas(False) elas não pararem na função pistasocupadas. True é quando não for as pistas
+    #'saopistas' será usado para quando rodar as pistas(False) elas não pararem na função pistasocupadas. True é quando não for as pistas
 
     flag = True #Flag para retornar se há algum erro(False) ou não(True).
 
@@ -150,7 +190,6 @@ def verificar(col, lin, val, matriz = list(), saopistas=True):
        flag = False
 
     # Verificacao se a posição na matriz já está ocupada:
-
     if matriz[col][lin] != " " and flag:
         flag = False
     # Verificacao das linhas e colunas
@@ -256,6 +295,37 @@ def pistasocupadas(col, lin, lista = list()):
     return flag
 
 
+# Funcao feita para ver as dicas quando o jogador solicitar:
+
+def dicas(col, lin, matriz = list()):
+    numerosdisponiveis = list()
+
+    ji = False #Caso dê jogada inválida (Dica em uma posição ocupada) será retornado para a função leitura que a jogada é inválida
+
+    if matriz[col][lin] != " ":
+        print(f'Posição já ocupada! Digite uma nova jogada.')
+        ji = True
+
+    else:
+        for i in range(1,10):
+            if verificar(col, lin, i, matriz):
+                numerosdisponiveis.append(i)
+
+        print(f'\nVALORES DISPONIVEIS: ', end='')
+        for i in numerosdisponiveis:
+            if i == numerosdisponiveis[len(numerosdisponiveis)-1]:
+                print(f'{i}')
+            else:
+                print(f'{i}, ', end="")
+
+    return ji
+
+
+#Funcao para quando o jogador querer deletar o valor de alguma posicao:
+
+def delete (col, lin, matriz):
+    matriz[col][lin] = ' '
+
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MAIN -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
 # Inicializando a matriz:
@@ -267,16 +337,21 @@ for i in range(9):
 posicaopistas = list() #Lista para salvar as posicoes das pistas 
 
 pistaoujogada = False #Variável booleana criada para a funcao leitura em que irá ler ou os arquivos das pistas ou a string da jogada 
-leitura(pistaoujogada)
+leituraIP(pistaoujogada)
 pistaoujogada = True
 
 jogada_invalida =  False #Variavel booleana criada para avisar quando a jogada for invalida e o jogador ter que digitar novamente sua jogada.
 
-while not completa(sudoku):
-  tabela(sudoku)
-  jogada = input('\nDigite sua jogada: ')
-  while leitura(pistaoujogada, jogada): #Enquanto a jogada for inválida ele irá repeti-la.
-    jogada = input('\nDigite sua jogada novamente: ')
+mostrartabela= [True] #Variável  para não mostrar tabela depois de usar dica
 
-if completa(sudoku):
-   print(f'VOCE GANHOU!!! Parabens!!!')
+if len(argv)==1:
+    while not completa(sudoku):
+        if mostrartabela[0]:
+            tabela(sudoku)
+        jogada = input('\nDigite sua jogada: ')
+        while leituraIP(pistaoujogada, jogada): #Enquanto a jogada for inválida ele irá repeti-la.
+            jogada = input('\nDigite sua jogada novamente: ')
+
+    if completa(sudoku):
+        print(f'VOCE GANHOU!!! Parabens!!!')
+    
