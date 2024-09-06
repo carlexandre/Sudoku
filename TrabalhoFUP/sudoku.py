@@ -6,6 +6,8 @@ letracoluna = [''] #Variável criada para salvar a letra da coluna para usar nos
 
 posicaopistas = list() #Lista para salvar as posicoes das pistas 
 
+posicao_jogadas = list() #Lista para salvar as posicoes das jogadas no modo BATCH
+
 mostrartabela = [True] #Variável para mostrar ou não a tabela
 
 arquivopistas = argv[1]
