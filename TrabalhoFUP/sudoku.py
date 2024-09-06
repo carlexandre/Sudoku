@@ -6,6 +6,8 @@ letracoluna = [''] #Variável criada para salvar a letra da coluna para usar nos
 
 posicaopistas = list() #Lista para salvar as posicoes das pistas 
 
+mostrartabela = [True] #Variável para mostrar ou não a tabela
+
 arquivopistas = argv[1]
 
 if len(argv)==3:
@@ -16,32 +18,33 @@ if len(argv)==3:
 # Funcao feita para imprimir a tabela com seus respectivos valores:
 
 def tabela(matriz=list()):
-    print("""                   _       _          
-     ___ _   _  __| | ___ | | ___   _ 
-    / __| | | |/ _` |/ _ \| |/ / | | |
-    \__ \ |_| | (_| | (_) |   <| |_| |
-    |___/\__,_|\__,_|\___/|_|\_\__,__|
-                                  """)
+    print('_'*85)
+    print(f"""                                        _       _          
+                          ___ _   _  __| | ___ | | ___   _ 
+                         / __| | | |/ _` |/ _ \| |/ / | | |
+                         \__ \ |_| | (_| | (_) |   <| |_| |
+                         |___/\__,_|\__,_|\___/|_|\_\__,__|
+                                                       """)
     
-    print(f"{'A':>5}{'B':>4}{'C':>4}{'D':>5}{'E':>4}{'F':>4}{'G':>5}{'H':>4}{'I':>4}")
-    print(' ++---+---+---++---+---+---++---+---+---++ ')
+    print(f"                     {'A':>5}{'B':>4}{'C':>4}{'D':>5}{'E':>4}{'F':>4}{'G':>5}{'H':>4}{'I':>4}")
+    print('                      ++---+---+---++---+---+---++---+---+---++ ')
     
     for i in range(1,4):
-      print(f'{i}|| {matriz[0][i-1]} | {matriz[1][i-1]} | {matriz[2][i-1]} || {matriz[3][i-1]} | {matriz[4][i-1]} | {matriz[5][i-1]} || {matriz[6][i-1]} | {matriz[7][i-1]} | {matriz[8][i-1]} ||{i}')
+      print(f'                     {i}|| {matriz[0][i-1]} | {matriz[1][i-1]} | {matriz[2][i-1]} || {matriz[3][i-1]} | {matriz[4][i-1]} | {matriz[5][i-1]} || {matriz[6][i-1]} | {matriz[7][i-1]} | {matriz[8][i-1]} ||{i}')
       if i!=3:
-        print(' ++---+---+---++---+---+---++---+---+---++ ')
-    print(' ++===+===+===++===+===+===++===+===+===++ ')
+        print('                      ++---+---+---++---+---+---++---+---+---++ ')
+    print('                      ++===+===+===++===+===+===++===+===+===++ ')
     
     for i in range(4,7):
-      print(f'{i}|| {matriz[0][i-1]} | {matriz[1][i-1]} | {matriz[2][i-1]} || {matriz[3][i-1]} | {matriz[4][i-1]} | {matriz[5][i-1]} || {matriz[6][i-1]} | {matriz[7][i-1]} | {matriz[8][i-1]} ||{i}')
+      print(f'                     {i}|| {matriz[0][i-1]} | {matriz[1][i-1]} | {matriz[2][i-1]} || {matriz[3][i-1]} | {matriz[4][i-1]} | {matriz[5][i-1]} || {matriz[6][i-1]} | {matriz[7][i-1]} | {matriz[8][i-1]} ||{i}')
       if i!=6:
-        print(' ++---+---+---++---+---+---++---+---+---++ ')
-    print(' ++===+===+===++===+===+===++===+===+===++ ')
+        print('                      ++---+---+---++---+---+---++---+---+---++ ')
+    print('                      ++===+===+===++===+===+===++===+===+===++ ')
     
     for i in range(7,10):
-      print(f'{i}|| {matriz[0][i-1]} | {matriz[1][i-1]} | {matriz[2][i-1]} || {matriz[3][i-1]} | {matriz[4][i-1]} | {matriz[5][i-1]} || {matriz[6][i-1]} | {matriz[7][i-1]} | {matriz[8][i-1]} ||{i}')
-      print(' ++---+---+---++---+---+---++---+---+---++ ')
-    print(f"{'A':>5}{'B':>4}{'C':>4}{'D':>5}{'E':>4}{'F':>4}{'G':>5}{'H':>4}{'I':>4}")
+      print(f'                     {i}|| {matriz[0][i-1]} | {matriz[1][i-1]} | {matriz[2][i-1]} || {matriz[3][i-1]} | {matriz[4][i-1]} | {matriz[5][i-1]} || {matriz[6][i-1]} | {matriz[7][i-1]} | {matriz[8][i-1]} ||{i}')
+      print('                      ++---+---+---++---+---+---++---+---+---++ ')
+    print(f"                     {'A':>5}{'B':>4}{'C':>4}{'D':>5}{'E':>4}{'F':>4}{'G':>5}{'H':>4}{'I':>4}")
 
 
 # Funcao feita para ler os arquivos e transformar em variáveis no MODO INTERATIVO e PISTAS:
@@ -57,12 +60,12 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
     if not poj:
       with open (arquivopistas, 'r') as pistas: #Leitura do arquivo para uma lista de strings
           for i in pistas.readlines():
-              varstring = i.replace(',','').replace(':','').replace(' ','').strip() #Tratamento das strings
+              varstring = i.replace(',','').replace(':','').replace(' ','').replace(';','').strip() #Tratamento das strings
               lista.append(varstring)
               posicaopistas.append(varstring)
 
     else:
-      varstring = string.replace(',','').replace(':','').replace(' ','').strip() #Tratamento das strings
+      varstring = string.replace(',','').replace(':','').replace(' ','').replace(';','').strip() #Tratamento das strings
       lista.append(varstring)
       
 
@@ -75,7 +78,7 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
               print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
               exit()
             else:
-              print("Jogada invalida! Por favor insira uma jogada valida.")
+              print("\nJogada Invalida! Por favor insira uma jogada valida.")
               jogada_inv = True
 
         if not jogada_inv and poj and i[0] in "?!":
@@ -111,7 +114,7 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
               print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
               exit()
             elif not jogada_inv:
-              print("Jogada invalida! Por favor insira uma jogada valida.")
+              print("\nJogada Invalida! Por favor insira uma jogada valida.")
               jogada_inv = True
 
         if not jogada_inv and poj and i[0] == "?":
@@ -125,26 +128,31 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
 
         elif not jogada_inv and poj and i[0] == "!":
             if pistasocupadas(col,int(i[2])-1, posicaopistas):
-                print("O espaco ja esta ocupado com uma pista e nao pode ser deletado.")
-            else:
+                print("\nO espaco ja esta ocupado com uma pista e nao pode ser deletado. Digite uma nova jogada.")
                 jogada_inv = True
-                booldicasdelete = True
-                delete(col,int(i[2])-1, sudoku)
+            else:
+                if sudoku[col][int(i[2])-1] != " ":
+                    jogada_inv = True
+                    booldicasdelete = True
+                    delete(col,int(i[2])-1, sudoku)
+                else:
+                    print(f'\nO espaco não tem valor para ser deletado. Digite um valor para ele ou insira uma nova jogada.')
+                    jogada_inv = True
         
         if not jogada_inv and len(lista)<1 or len(lista)>80: #Verificando se o total de pistas está entre o intervalo [1;80]
             if not poj:
               print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
               exit()
             else:
-              print("Jogada invalida! Por favor insira uma jogada valida.")
+              print("\nJogada Invalida! Por favor insira uma jogada valida.")
               jogada_inv = True
 
         elif not jogada_inv and i[2] not in '123456789': #Verificando se o valor está entre 1 e 9
             if not poj:
-              print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
+              print(f'\nO programa foi encerrado por motivos de Pistas Inválidas.')
               exit()
             else:
-              print("Jogada invalida! Por favor insira uma jogada valida.")
+              print("\nJogada Invalida! Por favor insira uma jogada valida.")
               jogada_inv = True
         
         elif not jogada_inv and i[1] not in '123456789': #Verificando se as linhas estão dentro as esperadas.
@@ -152,7 +160,7 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
               print(f'O programa foi encerrado por motivos de Pistas Inválidas.')
               exit()
             else:
-              print("Jogada invalida! Por favor insira uma jogada valida.")
+              print("\nJogada Invalida! Por favor insira uma jogada valida.")
               jogada_inv = True
 
         if not jogada_inv:
@@ -161,6 +169,9 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
 
             if verificar(col, lin, val, sudoku, not poj): #Verifica se está valido
                 add(col, lin, val, sudoku) #Adiciona na matriz
+                mostrartabela[0] = True
+                if poj:
+                    print(f'\nValor {val} adicionado na posicao [{letracoluna[0]}], [{lin+1}]')
         
             else:  #Caso não esteja válido verá qual o motivo abaixo
                 if not poj:
@@ -171,12 +182,15 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
                     if sudoku[col][lin] != " " and not pistasocupadas(col, lin, posicaopistas):
                         mt = 0
                     while mt!=1 and mt!=2:
-                        print(f'Posicao ja esta ocupada. Voce deseja manter o valor ou trocar pelo novo numero? [1] MANTER | [2] TROCAR ')
-                        mt = int(input())
+                        print(f'\nPosicao ja esta ocupada. Voce deseja manter o valor ou trocar pelo novo numero? [1] MANTER | [2] TROCAR ')
+                        mt = int(input('Sua resposta: '))
                     if mt == 2:
-                        add(col,lin,val,sudoku)
+                        if verificar(col, lin, val, sudoku):
+                            add(col,lin,val,sudoku)
+                        else:
+                            jogada_inv = True
                     else:
-                        print("Jogada invalida! Por favor insira uma jogada valida.")
+                        print("\nJogada Invalida! Por favor insira uma jogada valida.")
                         jogada_inv = True
     
     if booldicasdelete:
@@ -327,7 +341,7 @@ def dicas(col, lin, matriz = list()):
             if verificar(col, lin, i, matriz):
                 numerosdisponiveis.append(i)
 
-        print(f'\nValores Disponiveis({letracoluna[0]}, {lin+1}): ', end='')
+        print(f'\nValores Disponiveis [{letracoluna[0]}], [{lin+1}]: ', end='')
         for i in numerosdisponiveis:
             if i == numerosdisponiveis[len(numerosdisponiveis)-1]:
                 print(f'{i}')
@@ -342,7 +356,7 @@ def dicas(col, lin, matriz = list()):
 def delete (col, lin, matriz):
     valor = matriz[col][lin]
     matriz[col][lin] = ' '
-    print(f'\nValor {valor} removido da posição ({letracoluna[0]}, {lin+1})')
+    print(f'\nValor {valor} removido da posição [{letracoluna[0]}], [{lin+1}]')
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MAIN -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
@@ -356,15 +370,15 @@ pistaoujogada = False #Variável booleana criada para a funcao leitura em que ir
 leituraIP(pistaoujogada)
 pistaoujogada = True
 
-mostrartabela = [True] #Variável para não mostrar tabela depois de usar dica
-
 if len(argv)==2:
     while not completa(sudoku):
         if mostrartabela[0]:
             tabela(sudoku)
+        print('_'*85)
         jogada = input('\nDigite sua jogada: ')
         while leituraIP(pistaoujogada, jogada): #Enquanto a jogada for inválida ele irá repeti-la.
-            jogada = input('\nDigite sua jogada novamente: ')
+            print('_'*85)
+            jogada = input('\nDigite sua jogada: ')
 
     if completa(sudoku):
         print(f'\nVOCE GANHOU!!! Parabens!!!')
