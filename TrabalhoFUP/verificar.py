@@ -1,11 +1,18 @@
-def verificar(col, lin, val, matriz = list()):
+def verificar(col, lin, val, matriz = list(), saopistas=True): 
+    
+    #'saopistas' será usado para quando rodar as pistas(False) elas não pararem na função pistasocupadas. True é quando não for as pistas
 
-    flag = True #Flag para retornar se há algum erro ou não.
+    flag = True #Flag para retornar se há algum erro(False) ou não(True).
+
+    #Verificando se a posição na matriz é ocupada por uma pista:
+
+    if pistasocupadas(col, lin, posicaopistas) and not saopistas:
+       flag = False
 
     # Verificacao se a posição na matriz já está ocupada:
-
-    if matriz[col][lin] != " ":
+    if flag and matriz[col][lin] != " ":
         flag = False
+    
     # Verificacao das linhas e colunas
 
     i=0
