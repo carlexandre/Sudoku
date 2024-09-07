@@ -434,7 +434,7 @@ def leiturabatch():
             jogadas_invalidas.append(i) #Invalida pois a coluna não está no intervalo [A,I]
             jogada_inv = True
 
-        if not jogada_inv and i[1] not in '123456789' or i[2] not in '123456789':
+        if not jogada_inv and i[1] not in '123456789' or i[2] not in '987654321':
             jogadas_invalidas.append(i) #Invalida pois a linha ou o valor não estão no intervalo [1,9]
 
         elif i[0] == '!':
