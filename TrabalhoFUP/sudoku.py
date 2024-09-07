@@ -6,6 +6,8 @@ letracoluna = [''] #Variável criada para salvar a letra da coluna para usar nos
 
 posicaopistas = list() #Lista para salvar as posicoes das pistas 
 
+posicao_jogadas = list() #Lista para salvar as posicoes das jogadas no modo BATCH
+
 mostrartabela = [True] #Variável para mostrar ou não a tabela
 
 jogadas_invalidas = list() #Lista para salvar as jogadas invalidas no modo BATCH
@@ -476,6 +478,7 @@ if len(argv)==2:
             jogada = input('\nDigite sua jogada: ')
 
     if completa(sudoku):
+
         tabela(sudoku)
         print('_'*85)
         msg = 'YOU WIN!!!'
@@ -494,5 +497,3 @@ elif len(argv)==3:
         print('A grade foi preenchida com sucesso!')
     else:
         print('A grade nao foi preenchida!')
-
-    
