@@ -2,6 +2,8 @@
 
 from sys import argv #Será usada para ver os argumentos, arquivos e separar os modos
 
+import os
+
 letracoluna = [''] #Variável criada para salvar a letra da coluna para usar nos prints
 
 posicaopistas = list() #Lista para salvar as posicoes das pistas 
@@ -13,6 +15,10 @@ mostrartabela = [True] #Variável para mostrar ou não a tabela
 jogadas_invalidas = list() #Lista para salvar as jogadas invalidas no modo BATCH
 
 modo_batch = [False] #Variavel para saber se quando for ler uma pista está no modo batch
+
+frase = [False, ""] #Variavel criada para guardar frases para aparecer após a tabela
+
+comandosbool = [False] #Variavel criada para avisar quando estiver pedindo quais sao os comandos do jogo
 
 arquivopistas = argv[1]
 
@@ -148,8 +154,10 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
                 if sudoku[col][int(i[2])-1] != " ":
                     jogada_inv = True
                     booldicasdelete = True
-                    print(f'\nValor {sudoku[col][int(i[2])-1]} removido da posicao ({letracoluna[0]}, {i[2]})')
+                    frase[1] = f'                         Valor {sudoku[col][int(i[2])-1]} removido da posicao ({letracoluna[0]}, {i[2]})'
+                    frase[0] = True
                     delete(col,int(i[2])-1, sudoku)
+                    os.system("clear")
                 else:
                     print(f'\nO espaco não tem valor para ser deletado. Digite um valor para ele ou insira uma nova jogada.')
                     jogada_inv = True
@@ -186,8 +194,10 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
             if verificar(col, lin, val, sudoku, not poj): #Verifica se está valido
                 add(col, lin, val, sudoku) #Adiciona na matriz
                 mostrartabela[0] = True
+                os.system("clear")
                 if poj:
-                    print(f'\nValor {val} adicionado na posicao ({letracoluna[0]}, {lin+1})')
+                    frase[1] = f'                         Valor {val} adicionado na posicao ({letracoluna[0]}, {lin+1})'
+                    frase[0] = True
         
             else:  #Caso não esteja válido verá qual o motivo abaixo
                 if not poj:
@@ -207,6 +217,7 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
                     if mt == 2:
                         if verificar(col, lin, val, sudoku):
                             add(col,lin,val,sudoku)
+                            os.system("clear")
                         else:
                             jogada_inv = True
                     else:
@@ -353,7 +364,7 @@ def dicas(col, lin, matriz = list()):
     ji = False #Caso dê jogada inválida (Dica em uma posição ocupada) será retornado para a função leitura que a jogada é inválida
 
     if matriz[col][lin] != " ":
-        print(f'Posicao ja ocupada! Digite uma nova jogada.')
+        print(f'\nPosicao ja ocupada! Digite uma nova jogada.')
         ji = True
 
     else:
@@ -455,6 +466,85 @@ def leiturabatch():
             jogadas_invalidas.append(i) #Invalida pois não está seguindo as regras do sudoku
             jogada_inv = True
 
+
+#Funcao para mostrar o menu do modo interativo
+
+def show_menu():
+
+    comecar = False #So começará o jogo depois de digitar start
+
+    print(f"""\033[0;33;40m
+        .----------------.  .----------------.  .----------------.  .----------------.  .----------------.  .----------------. 
+    | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |
+    | |    _______   | || | _____  _____ | || |  ________    | || |     ____     | || |  ___  ____   | || | _____  _____ | |
+    | |   /  ___  |  | || ||_   _||_   _|| || | |_   ___ `.  | || |   .'    `.   | || | |_  ||_  _|  | || ||_   _||_   _|| |
+    | |  |  (__ \_|  | || |  | |    | |  | || |   | |   `. \ | || |  /  .--.  \  | || |   | |_/ /    | || |  | |    | |  | |
+    | |   '.___`-.   | || |  | '    ' |  | || |   | |    | | | || |  | |    | |  | || |   |  __'.    | || |  | '    ' |  | |
+    | |  |`\____) |  | || |   \ `--' /   | || |  _| |___.' / | || |  \  `--'  /  | || |  _| |  \ \_  | || |   \ `--' /   | |
+    | |  |_______.'  | || |    `.__.'    | || | |________.'  | || |   `.____.'   | || | |____||____| | || |    `.__.'    | |
+    | |              | || |              | || |              | || |              | || |              | || |              | |
+    | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
+        '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' 
+    \n\n\n\033[0;37;40m""")
+
+    print(f"""\t\t\t    _                     __                                                     
+    \t\t\t   | \ o  _  o _|_  _    (_ _|_  _. ._ _|_   ._   _. ._ _.    o  _   _   _. ._ | 
+    \t\t\t   |_/ | (_| |  |_ (/_   __) |_ (_| |   |_   |_) (_| | (_|    | (_) (_| (_| |  o 
+    \t\t\t          _|                                 |               _|      _|          \n\n\n""")
+    print("\t\t\t\t\t     \033[1;32;40mStart (Iniciar) | Comands (Comandos)")
+
+    menu = input('\n\t\t\t\t\t     Sua Opcao: \033[0;37;40m').upper().strip()
+
+    if menu == "START":
+        comecar = True
+        os.system("clear")
+
+    elif menu == "COMANDS":
+        os.system("clear")
+        if show_comandos():
+            comecar = True
+        else:
+            comecar = False
+
+    return comecar
+
+
+#Funcao para mostrar os comandos do sudoku
+
+def show_comandos():
+    print("""\033[0;33;40m .----------------.  .----------------.  .----------------.  .----------------.  .-----------------. .----------------.  .----------------.  .----------------. 
+| .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |
+| |     ______   | || |     ____     | || | ____    ____ | || |      __      | || | ____  _____  | || |  ________    | || |     ____     | || |    _______   | |
+| |   .' ___  |  | || |   .'    `.   | || ||_   \  /   _|| || |     /  \     | || ||_   \|_   _| | || | |_   ___ `.  | || |   .'    `.   | || |   /  ___  |  | |
+| |  / .'   \_|  | || |  /  .--.  \  | || |  |   \/   |  | || |    / /\ \    | || |  |   \ | |   | || |   | |   `. \ | || |  /  .--.  \  | || |  |  (__ \_|  | |
+| |  | |         | || |  | |    | |  | || |  | |\  /| |  | || |   / ____ \   | || |  | |\ \| |   | || |   | |    | | | || |  | |    | |  | || |   '.___`-.   | |
+| |  \ `.___.'\  | || |  \  `--'  /  | || | _| |_\/_| |_ | || | _/ /    \ \_ | || | _| |_\   |_  | || |  _| |___.' / | || |  \  `--'  /  | || |  |`\____) |  | |
+| |   `._____.'  | || |   `.____.'   | || ||_____||_____|| || ||____|  |____|| || ||_____|\____| | || | |________.'  | || |   `.____.'   | || |  |_______.'  | |
+| |              | || |              | || |              | || |              | || |              | || |              | || |              | || |              | |
+| '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
+ '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' \n\n\n\033[0;37;40m""")
+    print(f'\t\t\t\t\t\t\t\t \033[1;32;40mAjuda => ?Coluna(A-I), Linha(1-9)')
+    print(f'\n\t\t\t\t\t\t\t\tDeletar => !Coluna(A-I), Linha(1-9)')
+    print(f'\n\t\t\t\t\t\t\t  Adicionar => Coluna(A-I), Linha(1-9): Valor(1-9)\033[0;37;40m')
+
+    print('\n\n\n\t\t\t\t\t\t\t\t   (0) MENU || (1) START => ', end='')
+
+    resposta = input('')
+
+    while resposta not in "01":
+        resposta = input('\nOpcao Invalida. Sua Opcao: ')
+    
+    if resposta == '1':
+        comecar =  True
+    else:
+        comecar =  False
+    
+    comandosbool[0] = True
+
+    os.system('clear')
+
+    return comecar
+
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MAIN -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- #
 
 # Inicializando a matriz:
@@ -468,14 +558,25 @@ leituraIP(pistaoujogada)
 pistaoujogada = True
 
 if len(argv)==2:
+
+    while not show_menu():
+        if not comandosbool:
+            os.system("clear")
+        else:
+            comandosbool[0] = False
+    
     while not completa(sudoku):
-        if mostrartabela[0]:
-            tabela(sudoku)
-        print('_'*85)
-        jogada = input('\nDigite sua jogada: ')
-        while leituraIP(pistaoujogada, jogada): #Enquanto a jogada for inválida ele irá repeti-la.
+            if mostrartabela[0]:
+                tabela(sudoku)
+                print('_'*85)
+                if frase[0]:
+                    print(f'\n{frase[1]}')
+                    frase[0] = False
             print('_'*85)
             jogada = input('\nDigite sua jogada: ')
+            while leituraIP(pistaoujogada, jogada): #Enquanto a jogada for inválida ele irá repeti-la.
+                print('_'*85)
+                jogada = input('\nDigite sua jogada: ')
 
     if completa(sudoku):
 
@@ -497,3 +598,4 @@ elif len(argv)==3:
         print('A grade foi preenchida com sucesso!')
     else:
         print('A grade nao foi preenchida!')
+        
