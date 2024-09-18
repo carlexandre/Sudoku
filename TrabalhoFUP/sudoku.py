@@ -185,8 +185,12 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
               jogada_inv = True
 
         if not jogada_inv and not poj and pistasocupadas(col, int(i[1])-1, posicaopistas) and sudoku[col][int(i[1])-1]!=int(i[2]) and sudoku[col][int(i[1])-1]!=" ":
-                print('Configuracao de dicas invalida.')
-                exit()
+                if modo_batch[0]:
+                    print('Configuracao de dicas invalida.')
+                    exit()
+                else:
+                    print(f'\033[31;40mO programa foi encerrado por motivos de Pistas Invalidas.\033[m')
+                    exit()
 
         if not jogada_inv:
             lin = int(i[1])-1 #Adicionando valor para a linha
@@ -203,6 +207,7 @@ def leituraIP(poj = bool(), string=''): #poj = Pistas(False) ou Jogadas(True) | 
             else:  #Caso não esteja válido verá qual o motivo abaixo
                 if not poj:
                     if modo_batch[0]:
+                        
                         print('Configuracao de dicas invalida.')
                         exit()
                     else:
@@ -262,7 +267,9 @@ def verificar(col, lin, val, matriz = list(), saopistas=True, trocar=False):
 
     # Verificacao se a posição na matriz já está ocupada:
     if flag and matriz[col][lin] != " ":
-        if not trocar:
+        if modo_batch[0]==True and matriz[col][lin] == sudoku[col][lin]:
+            flag = True
+        elif not trocar:
             flag = False
         else:
             flag = True
@@ -416,7 +423,7 @@ def leiturabatch():
     #VALIDACAO DAS JOGADAS NO MODO BATCH
     with open(arquivobatch) as jogadas:
         for i in jogadas.readlines():
-            varstring = i.replace(',','').replace(':','').replace(' ','').replace(';','').strip()
+            varstring = i.replace(',','').replace(':','').replace(' ','').replace(';','').replace('.','').replace('%','').replace('*','').replace('#','').strip()
             lista_jogadas.append(varstring)
 
     for i in lista_jogadas:
@@ -432,37 +439,40 @@ def leiturabatch():
         else:
           a = 0
 
-        if not jogada_inv and i[a] in "AaBbCcDdEeFfGgHhIi":
-            if i[a] in "Aa":
-                col = 0
-            elif i[a] in "Bb":
-                col = 1
-            elif i[a] in "Cc":
-                col = 2
-            elif i[a] in "Dd":
-                col = 3
-            elif i[a] in "Ee":
-                col = 4
-            elif i[a] in "Ff":
-                col = 5
-            elif i[a] in "Gg":
-                col = 6
-            elif i[a] in "Hh":
-                col = 7
-            elif i[a] in "Ii":
-                col = 8
+        if not jogada_inv:
+            if i[1] not in '123456789' or i[2] not in '987654321':
+                jogada_inv = True
+                jogadas_invalidas.append(i) #Invalida pois a linha ou o valor não estão no intervalo [1,9]
 
-            lin = int(i[1])-1 #Adicionando valor para a linha
-            val = int(i[2]) #Valor a ser adicionado na matriz
+        if not jogada_inv:
+            if i[a] in "AaBbCcDdEeFfGgHhIi":
+                if i[a] in "Aa":
+                    col = 0
+                elif i[a] in "Bb":
+                    col = 1
+                elif i[a] in "Cc":
+                    col = 2
+                elif i[a] in "Dd":
+                    col = 3
+                elif i[a] in "Ee":
+                    col = 4
+                elif i[a] in "Ff":
+                    col = 5
+                elif i[a] in "Gg":
+                    col = 6
+                elif i[a] in "Hh":
+                    col = 7
+                elif i[a] in "Ii":
+                    col = 8
 
-        else:
-            jogadas_invalidas.append(i) #Invalida pois a coluna não está no intervalo [A,I]
-            jogada_inv = True
+                lin = int(i[1])-1 #Adicionando valor para a linha
+                val = int(i[2]) #Valor a ser adicionado na matriz
 
-        if not jogada_inv and i[1] not in '123456789' or i[2] not in '987654321':
-            jogadas_invalidas.append(i) #Invalida pois a linha ou o valor não estão no intervalo [1,9]
+            else:
+                jogadas_invalidas.append(i) #Invalida pois a coluna não está no intervalo [A,I]
+                jogada_inv = True
 
-        elif i[0] == '!':
+        if i[0] == '!':
             if pistasocupadas(col,lin, posicaopistas):
                 jogadas_invalidas.append(i)
                 jogada_inv = True #Invalida pois está querendo deletar uma pista inicial
@@ -473,12 +483,13 @@ def leiturabatch():
                     jogadas_invalidas.append(i)
                     jogada_inv = True #Invalida pois está querendo deletar um valor nulo
 
-        if not jogada_inv and verificar(col, lin, val, sudoku):
-            add(col, lin, val, sudoku)
+        if not jogada_inv:
+            if verificar(col, lin, val, sudoku):
+                add(col, lin, val, sudoku)
 
-        else:
-            jogadas_invalidas.append(i) #Invalida pois não está seguindo as regras do sudoku
-            jogada_inv = True
+            else:
+                jogadas_invalidas.append(i) #Invalida pois não está seguindo as regras do sudoku
+                jogada_inv = True
 
 
 #Funcao para mostrar o menu do modo interativo
@@ -505,18 +516,18 @@ def show_menu():
     \t\t\t   | \ o  _  o _|_  _    (_ _|_  _. ._ _|_   ._   _. ._ _.    o  _   _   _. ._ | 
     \t\t\t   |_/ | (_| |  |_ (/_   __) |_ (_| |   |_   |_) (_| | (_|    | (_) (_| (_| |  o 
     \t\t\t          _|                                 |               _|      _|          \n\n\n\033[0;37;40m""")
-    print("\t\t\t\t\t     Start (Iniciar) | Comands (Comandos)")
+    print("\t\t\t\t\t    (1) Start | (2) Comandos")
 
     menu = input('\n\t\t\t\t\t     Sua Opcao: ').upper().strip()
 
-    while menu != "START" and menu != "COMANDS": #Só irá aceitar respostas sendo start ou comands, fora isso irá pedir novamente.
+    while menu != "START" and menu != "COMANDOS" and menu not in "12": #Só irá aceitar respostas sendo start ou comands, fora isso irá pedir novamente.
         menu = input('\n\t\t\t\t\t    \033[31;40m Opcao Invalida. Sua Opcao: \033[m').upper().strip()
 
-    if menu == "START":
+    if menu == "START" or menu=='1':
         comecar = True
         os.system("clear")
 
-    elif menu == "COMANDS":
+    elif menu == "COMANDOS" or menu=='2':
         os.system("clear")
         if show_comandos(): #Se essa função for verdade quer dizer que o jogador escolheu iniciar o jogo na aba de comandos.
             comecar = True
@@ -530,16 +541,16 @@ def show_menu():
 
 def show_comandos():
     print("""\033[1;36;40m .----------------.  .----------------.  .----------------.  .----------------.  .-----------------. .----------------.  .----------------.  .----------------. 
-| .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |
-| |     ______   | || |     ____     | || | ____    ____ | || |      __      | || | ____  _____  | || |  ________    | || |     ____     | || |    _______   | |
-| |   .' ___  |  | || |   .'    `.   | || ||_   \  /   _|| || |     /  \     | || ||_   \|_   _| | || | |_   ___ `.  | || |   .'    `.   | || |   /  ___  |  | |
-| |  / .'   \_|  | || |  /  .--.  \  | || |  |   \/   |  | || |    / /\ \    | || |  |   \ | |   | || |   | |   `. \ | || |  /  .--.  \  | || |  |  (__ \_|  | |
-| |  | |         | || |  | |    | |  | || |  | |\  /| |  | || |   / ____ \   | || |  | |\ \| |   | || |   | |    | | | || |  | |    | |  | || |   '.___`-.   | |
-| |  \ `.___.'\  | || |  \  `--'  /  | || | _| |_\/_| |_ | || | _/ /    \ \_ | || | _| |_\   |_  | || |  _| |___.' / | || |  \  `--'  /  | || |  |`\____) |  | |
-| |   `._____.'  | || |   `.____.'   | || ||_____||_____|| || ||____|  |____|| || ||_____|\____| | || | |________.'  | || |   `.____.'   | || |  |_______.'  | |
-| |              | || |              | || |              | || |              | || |              | || |              | || |              | || |              | |
-| '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
- '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' \n\n\n\033[0;37;40m""")
+    | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |
+    | |     ______   | || |     ____     | || | ____    ____ | || |      __      | || | ____  _____  | || |  ________    | || |     ____     | || |    _______   | |
+    | |   .' ___  |  | || |   .'    `.   | || ||_   \  /   _|| || |     /  \     | || ||_   \|_   _| | || | |_   ___ `.  | || |   .'    `.   | || |   /  ___  |  | |
+    | |  / .'   \_|  | || |  /  .--.  \  | || |  |   \/   |  | || |    / /\ \    | || |  |   \ | |   | || |   | |   `. \ | || |  /  .--.  \  | || |  |  (__ \_|  | |
+    | |  | |         | || |  | |    | |  | || |  | |\  /| |  | || |   / ____ \   | || |  | |\ \| |   | || |   | |    | | | || |  | |    | |  | || |   '.___`-.   | |
+    | |  \ `.___.'\  | || |  \  `--'  /  | || | _| |_\/_| |_ | || | _/ /    \ \_ | || | _| |_\   |_  | || |  _| |___.' / | || |  \  `--'  /  | || |  |`\____) |  | |
+    | |   `._____.'  | || |   `.____.'   | || ||_____||_____|| || ||____|  |____|| || ||_____|\____| | || | |________.'  | || |   `.____.'   | || |  |_______.'  | |
+    | |              | || |              | || |              | || |              | || |              | || |              | || |              | || |              | |
+    | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
+    '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' \n\n\n\033[0;37;40m""")
     print(f'\t\t\t\t\t\t\t    \033[1;32;40mAjuda => ?Coluna(A-I), Linha(1-9)')
     print(f'\n\t\t\t\t\t\t\t   Deletar => !Coluna(A-I), Linha(1-9)')
     print(f'\n\t\t\t\t\t\t     Adicionar => Coluna(A-I), Linha(1-9): Valor(1-9)\033[0;37;40m')
@@ -609,7 +620,10 @@ elif len(argv)==3:
     leiturabatch()
 
     for i in jogadas_invalidas:
-        print(f'A jogada ({i[0].upper()}),({i[1]}) = {i[2]} eh invalida!')
+        if len(i) == 3:
+            print(f'A jogada ({i[0].upper()}),({i[1]}) = {i[2]} eh invalida!')
+        elif len(i)==2:
+            print(f'A jogada ({i[0].upper()}),({i[1]}) =  eh invalida!')
 
     if completa(sudoku):
         print('A grade foi preenchida com sucesso!')
